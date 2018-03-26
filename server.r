@@ -1,10 +1,75 @@
+library(shiny)
+library(ggplot2)
+library(ggthemes)
+library(Rmisc)
+
 shinyServer(function(input, output) {
-  require(ggplot2)
-  require(Rmisc)
+  # require(ggplot2)
+  # require(Rmisc)
   
   
-  #HISTOGRAM
-  output$histogram <- renderPlot({
+  #HISTOGRAM #####
+  # output$histogram <- renderPlot({
+  #   #LOADING DATA
+  #   FILE <- input$Data
+  #   
+  #   if (is.null(FILE))
+  #     return(NULL)
+  #   
+  #   dat.load <-
+  #     read.table(FILE$datapath, header = T, sep = input$separator)
+  #   classes <- sapply(dat.load, class)
+  #   
+  #   #PANEL FOR UI
+  #   output$HISTnames.selector <- renderUI({
+  #     selectInput(
+  #       inputId = "hist.x", label = "Select the variable to plot:", 
+  #       choices = names(dat.load)[classes == "numeric"])
+  #   })
+  #   
+  #   output$HISTmulti.selector <- renderUI({
+  #     selectInput(
+  #       inputId = "multi", label = "Select the facets variable:", 
+  #       choices = c("None",names(dat.load)[classes == "factor"]))
+  #   })
+  #   
+  #   #CREATE PLOT
+  #   hist.plot <- eventReactive(input$hist.button, {
+  #     if (input$multi != "None") {
+  #       data.histogram <-
+  #         data.frame(var = dat.load[,input$hist.x], multi = dat.load[,input$multi])
+  #       
+  #       plot <- ggplot(data = data.histogram,aes(x = var)) +
+  #         geom_histogram() +
+  #         xlab(paste(input$hist.x)) +
+  #         ylab("Frequency") +
+  #         ggtitle(paste("Histogram of",input$hist.x)) +
+  #         facet_wrap(~ multi) +
+  #         theme_minimal()
+  # 
+  #       print(plot)
+  #     } else {
+  #       data.histogram <- data.frame(var = dat.load[,input$hist.x])
+  #       
+  #       plot <- ggplot(data = data.histogram,aes(x = var)) +
+  #         geom_histogram() +
+  #         xlab(paste(input$hist.x)) +
+  #         ylab("Frequency") +
+  #         ggtitle(paste("Histogram of",input$hist.x)) +
+  #         theme_minimal()
+  # 
+  #       print(plot)
+  #     }
+  #     
+  #     
+  #   })
+  #   
+  #   #PLOT!
+  #   hist.plot()
+  #   
+  # })
+  
+  dat.load <- reactive({
     #LOADING DATA
     FILE <- input$Data
     
@@ -13,26 +78,55 @@ shinyServer(function(input, output) {
     
     dat.load <-
       read.table(FILE$datapath, header = T, sep = input$separator)
-    classes <- sapply(dat.load, class)
+    # classes <- sapply(dat.load, class)
     
-    #PANEL FOR UI
-    output$HISTnames.selector <- renderUI({
-      selectInput(
-        inputId = "hist.x", label = "Select the variable to plot:", 
-        choices = names(dat.load)[classes == "numeric"])
-    })
+    return(dat.load)
+  })
+
+  #PANEL FOR UI
+  output$HISTnames.selector <- renderUI({
+    selectInput(
+      inputId = "hist.x", label = "Select the variable to plot:",
+      # choices = names(dat.load())[classes == "numeric"])
+      choices = names(dat.load())[sapply(dat.load(), is.numeric)])
+  })
+
+  output$HISTmulti.selector <- renderUI({
+    selectInput(
+      inputId = "multi", label = "Select the facets variable:",
+      # choices = c("None",names(dat.load())[classes == "factor"]))
+      choices = c("None",names(dat.load())[sapply(dat.load(), is.numeric)]))
+  })
+
+  plotfunction <- eventReactive(input$hist.button, {
+    # #LOADING DATA
+    # FILE <- input$Data
+    # 
+    # if (is.null(FILE))
+    #   return(NULL)
+    # 
+    # dat.load <-
+    #   read.table(FILE$datapath, header = T, sep = input$separator)
+    # classes <- sapply(dat.load, class)
     
-    output$HISTmulti.selector <- renderUI({
-      selectInput(
-        inputId = "multi", label = "Select the facets variable:", 
-        choices = c("None",names(dat.load)[classes == "factor"]))
-    })
+    # #PANEL FOR UI
+    # output$HISTnames.selector <- renderUI({
+    #   selectInput(
+    #     inputId = "hist.x", label = "Select the variable to plot:",
+    #     choices = names(dat.load)[classes == "numeric"])
+    # })
+    # 
+    # output$HISTmulti.selector <- renderUI({
+    #   selectInput(
+    #     inputId = "multi", label = "Select the facets variable:",
+    #     choices = c("None",names(dat.load)[classes == "factor"]))
+    # })
     
     #CREATE PLOT
-    hist.plot <- eventReactive(input$hist.button, {
+    # hist.plot <- eventReactive(input$hist.button, {
       if (input$multi != "None") {
         data.histogram <-
-          data.frame(var = dat.load[,input$hist.x], multi = dat.load[,input$multi])
+          data.frame(var = dat.load()[,input$hist.x], multi = dat.load()[,input$multi])
         
         plot <- ggplot(data = data.histogram,aes(x = var)) +
           geom_histogram() +
@@ -41,10 +135,10 @@ shinyServer(function(input, output) {
           ggtitle(paste("Histogram of",input$hist.x)) +
           facet_wrap(~ multi) +
           theme_minimal()
-
-        print(plot)
+        
+        # print(plot)
       } else {
-        data.histogram <- data.frame(var = dat.load[,input$hist.x])
+        data.histogram <- data.frame(var = dat.load()[,input$hist.x])
         
         plot <- ggplot(data = data.histogram,aes(x = var)) +
           geom_histogram() +
@@ -52,21 +146,25 @@ shinyServer(function(input, output) {
           ylab("Frequency") +
           ggtitle(paste("Histogram of",input$hist.x)) +
           theme_minimal()
-
-        print(plot)
+        
+        # print(plot)
       }
-      
-      
-    })
     
-    #PLOT!
-    hist.plot()
+  #PLOT!
+  # hist.plot()
+    
+  return(plot)
     
   })
   
+  output$histogram <- renderPlot({
+    plotfunction()
+  })
   
-  #BAR CHART
+  
+  #BAR CHART #####
   output$barchart <- renderPlot({
+  # output$plot <- renderPlot({
     #LOADING DATA
     FILE <- input$Data
     
@@ -447,5 +545,23 @@ shinyServer(function(input, output) {
     time_series.plot()
     
   })
+  
+  ##### download plot #####
+  
+  output$downPlot <- downloadHandler(
+    filename =  function() {
+      paste("plot", input$var3, sep = ".")
+    },
+    content = function(file) {
+      ht <- as.numeric(input$height)
+      wd <- as.numeric(input$height)*as.numeric(input$ratio)
+      if (input$var3 == "png")
+        png(file, units = "in", width = wd, height = ht, res = 600)
+      else
+        cairo_pdf(file, width = wd, height = ht)
+      print(plotfunction())
+      dev.off()
+    }
+  )
   
 })

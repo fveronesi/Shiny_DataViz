@@ -1,3 +1,5 @@
+library(shiny)
+  
 shinyUI(fluidPage(
   titlePanel("Data Visualization in R"),
   
@@ -70,7 +72,35 @@ shinyUI(fluidPage(
         uiOutput("TSx.selector"),
         uiOutput("TSy.selector"),
         actionButton("ts.button", "Plot!")
-      )
+      ),
+      
+      tags$hr(),
+      
+      h5(strong("Plot specifications for download")),
+      
+      radioButtons(inputId = "var3", label = strong("Select the file type"), choices = list("pdf", "png"),
+                   selected = "pdf", inline = TRUE),
+      
+      # sliderInput("width",
+      #             strong("Plot width (in inch)"),
+      #             1, 15, 8, .1),
+      
+      sliderInput("height",
+                  strong("Plot height (in inch)"),
+                  1, 15, 5, .1),
+      
+      selectInput("ratio", label = strong("Aspect ratio"),
+                  choices = list("2.414:1" = "2.414",
+                                 "1.618:1" = "1.618",
+                                 "3:2" = "1.5",
+                                 "4:3" = "1.333333",
+                                 "1:1" = "1",
+                                 "3:4" = "0.75",
+                                 "2:3" = "0.6666667",
+                                 "1:1.618" = "0.618047",
+                                 "1:2.414" = "0.4142502"),
+                  selected = "1.618"),
+      downloadButton("downPlot", "Download current plot")
       
       
     ),
