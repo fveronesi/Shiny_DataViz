@@ -18,8 +18,7 @@ For scatterplots, if the option for faceting is provided each plot will include 
 
 
 
-## Future Work
+## Download Buttons
 
-I tested several lines of code trying to save each olot and allow users to download what they created in tif at 300dpi. However, nothing worked so far. I will keep try and if anyone has suggestion please feel free to include them in the code provided.
-
-Please report any bug or requests for new features.
+Version 2 of the app allows users to download plots at 600dpi. The file size is around 50Mb, but I decided to just allow one save because if users need low-res versions they can simply right-click on the image on screen and save it.
+I would like to thank hplieninger for his support!!
