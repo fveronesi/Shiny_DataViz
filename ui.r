@@ -1,3 +1,5 @@
+library(shinycssloaders)
+
 shinyUI(fluidPage(
   titlePanel("Data Visualization in R"),
   
@@ -26,7 +28,8 @@ shinyUI(fluidPage(
         condition = "input.TypePlot == 'hist'",
         uiOutput("HISTnames.selector"),
         uiOutput("HISTmulti.selector"),
-        actionButton("hist.button", "Plot!")
+        actionButton("hist.button", "Plot!"),
+        downloadButton("hist.DW", "Download Plot")
       ),
       
       
@@ -37,7 +40,8 @@ shinyUI(fluidPage(
         uiOutput("BARy.selector"),
         uiOutput("BARfac.selector"),
         uiOutput("BARcol.selector"),
-        actionButton("barchart.button", "Plot!")
+        actionButton("barchart.button", "Plot!"),
+        downloadButton("bar.DW", "Download Plot")
       ),
       
       
@@ -46,7 +50,8 @@ shinyUI(fluidPage(
         condition = "input.TypePlot == 'box'",
         uiOutput("BOXx.selector"),
         uiOutput("BOXy.selector"),
-        actionButton("box.button", "Plot!")
+        actionButton("box.button", "Plot!"),
+        downloadButton("box.DW", "Download Plot")
       ),
       
       
@@ -58,7 +63,8 @@ shinyUI(fluidPage(
         uiOutput("SCPcol.selector"),
         uiOutput("SCPsize.selector"),
         uiOutput("SCPfacet.selector"),
-        actionButton("sct.button", "Plot!")
+        actionButton("sct.button", "Plot!"),
+        downloadButton("sct.DW", "Download Plot")
       ),
       
     
@@ -69,7 +75,8 @@ shinyUI(fluidPage(
         condition = "input.TypePlot == 'ts'",
         uiOutput("TSx.selector"),
         uiOutput("TSy.selector"),
-        actionButton("ts.button", "Plot!")
+        actionButton("ts.button", "Plot!"),
+        downloadButton("ts.DW", "Download Plot")
       )
       
       
@@ -80,25 +87,25 @@ shinyUI(fluidPage(
     mainPanel(
       #HISTOGRAM
       conditionalPanel(condition = "input.TypePlot == 'hist'",
-                       plotOutput('histogram')),
+                       withSpinner(plotOutput('histogram'))),
       
       #BAR CHART
       conditionalPanel(condition = "input.TypePlot == 'bar'",
-                       plotOutput('barchart')),
+                       withSpinner(plotOutput('barchart'))),
       
       #BOX PLOT
       conditionalPanel(condition = "input.TypePlot == 'box'",
-                       plotOutput('boxplot')),
+                       withSpinner(plotOutput('boxplot'))),
       
       
       #SCATTERPLOT
       conditionalPanel(condition = "input.TypePlot == 'points'",
-                       plotOutput('scatterplot')),
+                       withSpinner(plotOutput('scatterplot'))),
       
       
       #TIME-SERIES
       conditionalPanel(condition = "input.TypePlot == 'ts'",
-                       plotOutput('time_series'))
+                       withSpinner(plotOutput('time_series')))
       
     )
     
