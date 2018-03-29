@@ -2,7 +2,7 @@
 
 I first developed a Shiny app similar to this as part of the video course "Learning R for Data Visualization", which I published with Packt:
 
-<img src="https://d1ldz4te4covpm.cloudfront.net/sites/default/files/imagecache/ppv4_main_book_cover/bookretailers/9781785882890.jpg" width="200" height="400" />
+<img src="https://d1ldz4te4covpm.cloudfront.net/sites/default/files/imagecache/ppv4_main_book_cover/bookretailers/9781785882890.jpg" width="200" height="300" />
 
 
 In the video course the focus was on developing an Shiny app for the first time, so the final app was relatively simple. This new version includes more plots, a list is available below:
