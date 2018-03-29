@@ -1,6 +1,6 @@
 # Shiny_DataViz
 
-I first developed a Shiny app similar to this as part of the video course "Learning R for Data Visualization", which I published with Packt:
+I first developed a Shiny app similar to this as part of the video course "[Learning R for Data Visualization](https://www.packtpub.com/big-data-and-business-intelligence/learning-r-data-visualization-video)", which I published with Packt:
 
 <img src="https://d1ldz4te4covpm.cloudfront.net/sites/default/files/imagecache/ppv4_main_book_cover/bookretailers/9781785882890.jpg" width="200" height="300" />
 
