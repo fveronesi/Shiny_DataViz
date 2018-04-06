@@ -19,6 +19,201 @@ shinyServer(function(input, output) {
   
   
   
+  #UI
+  observeEvent(input$TypePlot == "hist",{
+    output$HISTnames.selector <- renderUI({
+      selectInput(
+        inputId = "hist.x", label = "Select the variable to plot:", 
+        choices = names(DATA())[CLASSES() %in% c("numeric", "integer")])
+    })
+    
+    output$HISTmulti.selector <- renderUI({
+      selectInput(
+        inputId = "multi", label = "Select the facets variable:", 
+        choices = c("None",names(DATA())[CLASSES() == "factor"]))
+    })
+    
+  })
+  
+  
+  observeEvent(input$TypePlot == "bar", {
+    output$BARx.selector <- renderUI({
+      selectInput(
+        inputId = "x.bar", label = "Select the variable for X:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$BARy.selector <- renderUI({
+      selectInput(
+        inputId = "y.bar", label = "Select the variable for Y:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    output$BARfac.selector <- renderUI({
+      selectInput(
+        inputId = "fac.bar", label = "Select the variable for faceting:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$BARcol.selector <- renderUI({
+      selectInput(
+        inputId = "col.bar", label = "Select the variable for color:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$Bar.order <- renderUI({
+      checkboxInput(
+        inputId = "order.bar", label = "Reorder:",
+        value=F
+      )
+    })
+    
+  })
+  
+  
+  observeEvent(input$TypePlot == "inter", {
+    output$INTER_F1.selector <- renderUI({
+      selectInput(
+        inputId = "F1.inter", label = "Select the first categorical variable:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$INTER_F2.selector <- renderUI({
+      selectInput(
+        inputId = "F2.inter", label = "Select the second categorical variable:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$INTER_RES.selector <- renderUI({
+      selectInput(
+        inputId = "Resp.inter", label = "Select the response variable:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    
+    output$INTER_ERR.selector <- renderUI({
+      checkboxInput(
+        inputId = "Err.inter", label = "Error bars",value = FALSE
+      )
+    })
+    
+  })
+  
+  
+  
+  observeEvent(input$TypePlot == "box", {
+    output$BOXx.selector <- renderUI({
+      selectInput(
+        inputId = "x.box", label = "Select the variable for X:",
+        choices = names(DATA())[CLASSES() == "factor"]
+      )
+    })
+    
+    output$BOXy.selector <- renderUI({
+      selectInput(
+        inputId = "y.box", label = "Select the variable for Y:",
+        choices = names(DATA())[CLASSES() %in% c("numeric", "integer")]
+      )
+    })
+    
+    output$BOXcol.selector <- renderUI({
+      selectInput(
+        inputId = "col.box", label = "Select the variable for Color:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$BOXnotch.selector <- renderUI({
+      checkboxInput(
+        inputId = "notch.box", label = "Include Notches",
+        value=F
+      )
+    })
+    
+  })
+  
+  observeEvent(input$TypePlot == "points", {
+    
+    output$SCPx.selector <- renderUI({
+      selectInput(
+        inputId = "x.sct", label = "Select the variable for X:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    output$SCPy.selector <- renderUI({
+      selectInput(
+        inputId = "y.sct", label = "Select the variable for Y:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    output$SCPcol.selector <- renderUI({
+      selectInput(
+        inputId = "col.sct", label = "Select the variable for color:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    output$SCPsize.selector <- renderUI({
+      selectInput(
+        inputId = "size.sct", label = "Select the variable for size:",
+        choices = c(None = 0,names(DATA())[CLASSES() %in% c("numeric", "integer")])
+      )
+    })
+    
+    output$SCPfacet.selector <- renderUI({
+      selectInput(
+        inputId = "facet.sct", label = "Select the variable for faceting:",
+        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
+      )
+    })
+  })
+  
+  
+  observeEvent(input$TypePlot == "ts", {
+    
+    output$TSx.selector <- renderUI({
+      selectInput(
+        inputId = "x.ts", label = "Select the variable for X:",
+        choices = names(DATA())[CLASSES() == "factor"]
+      )
+    })
+    
+    output$TSy.selector <- renderUI({
+      selectInput(
+        inputId = "y.ts", label = "Select the variable for Y:",
+        choices = names(DATA())[CLASSES() %in% c("numeric", "integer")]
+      )
+    })
+    
+    output$TScol.selector <- renderUI({
+      selectInput(
+        inputId = "col.ts", label = "Select the variable for color:",
+        choices = c("None",names(DATA())[CLASSES() == "factor"])
+      )
+    })
+    
+    output$TS.format <- renderUI({
+      textInput(
+        inputId = "format.ts", label = tags$a(href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/strptime.html", target="_blank","Date format:"),
+        value = "%Y-%m-%d"
+      )
+    })
+    
+    
+  })
+  
+  
+  
+  
   
   #HISTOGRAM
   hist.plot <- eventReactive(input$hist.button, {
@@ -63,27 +258,45 @@ shinyServer(function(input, output) {
                    y = DATA()[,input$y.bar],
                    facet = DATA()[,input$fac.bar])
       
-      
-      ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
-        stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-        stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.5) +
-        facet_wrap(~facet) + 
-        theme_minimal() +
-        xlab(input$x.bar) + 
-        ylab(input$y.bar)
+      if(input$order.bar){
+        ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
+          facet_wrap(~facet) + 
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+      } else {
+        ggplot(data.barchart, aes(x=x, y=y)) +
+          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
+          facet_wrap(~facet) + 
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+      }
       
     } else if(input$fac.bar == 0 & input$col.bar == 0){
       data.barchart <-
         data.frame(x = DATA()[,input$x.bar],
                    y = DATA()[,input$y.bar])
       
-      
-      ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
-        stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-        stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.5) +
-        theme_minimal() +
-        xlab(input$x.bar) + 
-        ylab(input$y.bar)
+      if(input$order.bar){
+        ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+        
+      } else {
+        ggplot(data.barchart, aes(x=x, y=y)) +
+          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+      }
       
     } else if(input$fac.bar == 0 & input$col.bar != 0){
       data.barchart <-
@@ -91,12 +304,24 @@ shinyServer(function(input, output) {
                    y = DATA()[,input$y.bar],
                    color = DATA()[,input$col.bar])
       
-      ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
-        stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-        stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge", width = 0.5) +
-        theme_minimal() +
-        xlab(input$x.bar) + 
-        ylab(input$y.bar)
+      if(input$order.bar){
+        ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+          labs(fill=paste(input$col.bar)) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+        
+      } else {
+        ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+          labs(fill=paste(input$col.bar)) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) +
+          theme_minimal()
+      }
       
     } else {
       data.barchart <-
@@ -105,32 +330,110 @@ shinyServer(function(input, output) {
                    color = DATA()[,input$col.bar],
                    facet = DATA()[,input$fac.bar])
       
-      ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
-        stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-        stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-        facet_wrap(~facet) +
-        theme_minimal() +
-        xlab(input$x.bar) + 
-        ylab(input$y.bar)
+      if(input$order.bar){
+        ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+          labs(fill=paste(input$col.bar)) +
+          facet_wrap(~facet) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) + 
+          theme_minimal()
+        
+      } else {
+        ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
+          labs(fill=paste(input$col.bar)) +
+          facet_wrap(~facet) +
+          xlab(input$x.bar) + 
+          ylab(input$y.bar) + 
+          theme_minimal()
+      }
+      
       
     }
   })
   
+  
+  #interaction
+  INTERACTION.plot <- eventReactive(input$inter.button, {
+
+      data.interaction <-
+        data.frame(F1 = DATA()[,input$F1.inter],
+                   F2 = DATA()[,input$F2.inter],
+                   RESP = DATA()[,input$Resp.inter])
+      
+      if(input$Err.inter==TRUE){
+        ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+          stat_summary(fun.y = mean, geom = "point") +
+          stat_summary(fun.y = mean, geom = "line") +
+          stat_summary(geom = "errorbar", fun.data = mean_se, width=0.1) +
+          labs(color=paste(input$F2.inter)) +
+          xlab(paste(input$F1.inter)) +
+          ylab(paste(input$Resp.inter)) +
+          theme_minimal()
+      } else {
+        ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+          stat_summary(fun.y = mean, geom = "point") +
+          stat_summary(fun.y = mean, geom = "line") +
+          labs(color=paste(input$F2.inter)) +
+          xlab(paste(input$F1.inter)) +
+          ylab(paste(input$Resp.inter)) +
+          theme_minimal()
+      }
+      
+      
+     
+  })
+  
+  
+  
   #BOXPLOT
   boxplot.plot <- eventReactive(input$box.button, {
     
+    if(input$col.box == 0){
+      data.boxplot <-
+        data.frame(x = DATA()[,input$x.box],
+                   y = DATA()[,input$y.box])
+      
+      if(input$notch.box){
+        ggplot(data = data.boxplot,aes(x = x, y = y)) +
+          geom_boxplot(notch=T) +
+          xlab(paste(input$x.box)) +
+          ylab(paste(input$y.box)) +
+          theme_minimal()
+      } else {
+        ggplot(data = data.boxplot,aes(x = x, y = y)) +
+          geom_boxplot() +
+          xlab(paste(input$x.box)) +
+          ylab(paste(input$y.box)) +
+          theme_minimal()
+      }
+      
+    } else {
+      data.boxplot <-
+        data.frame(x = DATA()[,input$x.box],
+                   y = DATA()[,input$y.box],
+                   col = DATA()[,input$col.box])
+      
+      if(input$notch.box){
+        ggplot(data = data.boxplot,aes(x = x, y = y, fill=col)) +
+          labs(fill=paste(input$col.box)) + 
+          geom_boxplot(position = "dodge", notch=T) +
+          xlab(paste(input$x.box)) +
+          ylab(paste(input$y.box)) +
+          theme_minimal()
+      } else {
+        ggplot(data = data.boxplot,aes(x = x, y = y, fill=col)) +
+          geom_boxplot(position = "dodge") +
+          xlab(paste(input$x.box)) +
+          ylab(paste(input$y.box)) +
+          theme_minimal()
+      }
+      
+    }
     
-    data.boxplot <-
-      data.frame(x = DATA()[,input$x.box],
-                 y = DATA()[,input$y.box])
-    
-    plot <- ggplot(data = data.boxplot,aes(x = x, y = y)) +
-      geom_boxplot() +
-      xlab(paste(input$x.box)) +
-      ylab(paste(input$y.box)) +
-      theme_minimal()
-    
-    print(plot)
   })
   
   
@@ -146,7 +449,7 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point(mapping = aes(color = color)) +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
         labs(color = paste(input$col.sct)) +
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
@@ -165,7 +468,7 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point(mapping = aes(color = color, size = size)) +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
         labs(color = paste(input$col.sct), size = paste(input$size.sct)) +
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
@@ -185,7 +488,8 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point(mapping = aes(color = color, size = size)) +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        labs(colour=paste(input$col.sct), size=paste(input$size.sct)) +
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
         theme_bw()+
@@ -200,7 +504,7 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point() +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
         theme_minimal()
@@ -218,7 +522,8 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point(mapping = aes(color = color)) +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        labs(colour=input$col.sct) + 
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
         theme_bw()+
@@ -237,7 +542,7 @@ shinyServer(function(input, output) {
       
       plot <- ggplot(data = data.scatterplot, aes(x = x, y = y)) +
         geom_point() +
-        ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
+        #ggtitle(paste0("Scatterplot ",input$x.sct, " vs. ", input$y.sct)) +
         xlab(paste(input$x.sct)) +
         ylab(paste(input$y.sct)) +
         theme_bw()+
@@ -251,202 +556,142 @@ shinyServer(function(input, output) {
   
   #TIME-SERIES
   time_series.plot <- eventReactive(input$ts.button, {
-
-    data.time_series <-
-      data.frame(x = as.Date(DATA()[,input$x.ts]),
-                 y = DATA()[,input$y.ts])
     
-    plot <- ggplot(data = data.time_series,aes(x = x, y = y)) +
-      geom_line() +
-      xlab("Date") +
-      ylab(paste(input$y.ts)) +
-      theme_minimal()
+    if(input$col.ts=="None"){
+      data.time_series <-
+        data.frame(x = as.Date(DATA()[,input$x.ts], format=input$format.ts),
+                   y = DATA()[,input$y.ts])
+      
+      ggplot(data = data.time_series,aes(x = x, y = y)) +
+        geom_line() +
+        xlab("Date") +
+        ylab(paste(input$y.ts)) +
+        theme_minimal()
+    } else {
+      data.time_series <-
+        data.frame(x = as.Date(DATA()[,input$x.ts], format=input$format.ts),
+                   y = DATA()[,input$y.ts],
+                   col = DATA()[,input$col.ts])
+      
+      ggplot(data = data.time_series,aes(x = x, y = y, color=col)) +
+        geom_line() +
+        labs(color=paste(input$col.ts)) +
+        xlab("Date") +
+        ylab(paste(input$y.ts)) +
+        theme_minimal()
+    }
     
-    print(plot)
+    
   })
   
   #PLOTTING OUTPUTS
   
   output$histogram <- renderPlot({
-    output$HISTnames.selector <- renderUI({
-      selectInput(
-        inputId = "hist.x", label = "Select the variable to plot:", 
-        choices = names(DATA())[CLASSES() == "numeric"])
-    })
-    
-    output$HISTmulti.selector <- renderUI({
-      selectInput(
-        inputId = "multi", label = "Select the facets variable:", 
-        choices = c("None",names(DATA())[CLASSES() == "factor"]))
-    })
-    
     print(hist.plot())
   })
   
   
   output$barchart <- renderPlot({
-  output$BARx.selector <- renderUI({
-      selectInput(
-        inputId = "x.bar", label = "Select the variable for X:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
-      )
-    })
-    
-    output$BARy.selector <- renderUI({
-      selectInput(
-        inputId = "y.bar", label = "Select the variable for Y:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "numeric"])
-      )
-    })
-    
-    output$BARfac.selector <- renderUI({
-      selectInput(
-        inputId = "fac.bar", label = "Select the variable for faceting:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
-      )
-    })
-    
-    output$BARcol.selector <- renderUI({
-      selectInput(
-        inputId = "col.bar", label = "Select the variable for color:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
-      )
-    })
-	
     print(barchart.plot())
   })
   
   
+  output$interaction <- renderPlot({
+    print(INTERACTION.plot())
+  })
+  
+  
   output$boxplot <- renderPlot({
-  output$BOXx.selector <- renderUI({
-      selectInput(
-        inputId = "x.box", label = "Select the variable for X:",
-        choices = names(DATA())[CLASSES() == "factor"]
-      )
-    })
-    
-    output$BOXy.selector <- renderUI({
-      selectInput(
-        inputId = "y.box", label = "Select the variable for Y:",
-        choices = names(DATA())[CLASSES() == "numeric"]
-      )
-    })
-	
     print(boxplot.plot())
   })
   
   
   output$scatterplot <- renderPlot({
-  output$SCPx.selector <- renderUI({
-      selectInput(
-        inputId = "x.sct", label = "Select the variable for X:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "numeric"])
-      )
-    })
-    
-    output$SCPy.selector <- renderUI({
-      selectInput(
-        inputId = "y.sct", label = "Select the variable for Y:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "numeric"])
-      )
-    })
-    
-    output$SCPcol.selector <- renderUI({
-      selectInput(
-        inputId = "col.sct", label = "Select the variable for color:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "numeric"])
-      )
-    })
-    
-    output$SCPsize.selector <- renderUI({
-      selectInput(
-        inputId = "size.sct", label = "Select the variable for size:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "numeric"])
-      )
-    })
-    
-    output$SCPfacet.selector <- renderUI({
-      selectInput(
-        inputId = "facet.sct", label = "Select the variable for faceting:",
-        choices = c(None = 0,names(DATA())[CLASSES() == "factor"])
-      )
-    })
-	
     print(scatterplot.plot())
   })
   
   
   output$time_series <- renderPlot({
-  output$TSx.selector <- renderUI({
-      selectInput(
-        inputId = "x.ts", label = "Select the variable for X:",
-        choices = names(DATA())[CLASSES() == "factor"]
-      )
-    })
-    
-    output$TSy.selector <- renderUI({
-      selectInput(
-        inputId = "y.ts", label = "Select the variable for Y:",
-        choices = names(DATA())[CLASSES() == "numeric"]
-      )
-    })
-	
     print(time_series.plot())
   })
   
   
+  WIDTH = eventReactive(input$wdt,{
+     if(input$wdt!=""){as.numeric(input$wdt)}else{NA}
+    
+  })
+  
+  HEIGTH = eventReactive(input$hgt,{
+    if(input$hgt!=""){as.numeric(input$hgt)}else{NA}
+  })
+  
+
+  
   #DOWNLOAD
   output$hist.DW <- downloadHandler(
-      filename =  function() {
-        paste0("Histogram.tiff")
-
-      },
-      content = function(file) {
-        ggsave(filename=file, dpi = 600)
-      }
-    )
+    filename =  function() {
+      paste0("Histogram",input$hist.x,".tiff")
+      
+    },
+    content = function(file) {
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
+    }
+  )
   
   
   output$box.DW <- downloadHandler(
     filename =  function() {
-      paste0("BoxPlot.tiff")
+      paste0("BoxPlot",input$x.box,"_",input$y.box,".tiff")
       
     },
     content = function(file) {
-      ggsave(filename=file, dpi = 600)
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
     }
   )
   
   
   output$bar.DW <- downloadHandler(
     filename =  function() {
-      paste0("Barchart.tiff")
+      paste0("Barchart",input$x.bar,"_",input$y.bar,".tiff")
+      
       
     },
     content = function(file) {
-      ggsave(filename=file, dpi = 600)
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
+    }
+  )
+  
+  
+  output$inter.DW <- downloadHandler(
+    filename =  function() {
+      paste0("Interaction",input$F1.inter,"_",input$F2.inter,".tiff")
+      
+      
+    },
+    content = function(file) {
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
     }
   )
   
   
   output$sct.DW <- downloadHandler(
     filename =  function() {
-      paste0("Scatterplot.tiff")
+      paste0("Scatterplot",input$x.sct,"_",input$y.sct,".tiff")
       
     },
     content = function(file) {
-      ggsave(filename=file, dpi = 600)
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
     }
   )
   
   
   output$ts.DW <- downloadHandler(
     filename =  function() {
-      paste0("TimeSeries.tiff")
+      paste0("TimeSeries",input$y.ts,".tiff")
       
     },
     content = function(file) {
-      ggsave(filename=file, dpi = 600)
+      ggsave(filename=file, dpi = as.numeric(input$dpi), width=WIDTH(), height=HEIGTH(), units=input$unt)
     }
   )
   
