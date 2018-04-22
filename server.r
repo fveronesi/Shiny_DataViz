@@ -1,6 +1,15 @@
 shinyServer(function(input, output) {
   require(ggplot2)
   require(Rmisc)
+  require(Hmisc)
+  
+  options(shiny.sanitize.errors = F)
+  
+  med.CI = function(x){
+    y=median(x)
+    CI=1.57*(IQR(x)/sqrt(length(x)))
+    data.frame(y=y, ymin=y-CI, ymax=y+CI)
+  }
   
   
   #LOADING DATA
@@ -37,6 +46,7 @@ shinyServer(function(input, output) {
   
   
   observeEvent(input$TypePlot == "bar", {
+
     output$BARx.selector <- renderUI({
       selectInput(
         inputId = "x.bar", label = "Select the variable for X:",
@@ -65,17 +75,15 @@ shinyServer(function(input, output) {
       )
     })
     
-    output$Bar.order <- renderUI({
-      checkboxInput(
-        inputId = "order.bar", label = "Reorder:",
-        value=F
-      )
-    })
     
   })
   
   
   observeEvent(input$TypePlot == "inter", {
+    output$INTER.normal <- renderUI({
+      checkboxInput(inputId="inter.norm", label="Normal Distribution", value=T)
+    })
+    
     output$INTER_F1.selector <- renderUI({
       selectInput(
         inputId = "F1.inter", label = "Select the first categorical variable:",
@@ -250,109 +258,444 @@ shinyServer(function(input, output) {
   #BARCHART
   barchart.plot <- eventReactive(input$barchart.button, {
     
-    
-    #Here we add a condition to allow users not to fill the bar-chart
-    if (input$fac.bar != 0 & input$col.bar == 0) {
-      data.barchart <-
-        data.frame(x = DATA()[,input$x.bar],
-                   y = DATA()[,input$y.bar],
-                   facet = DATA()[,input$fac.bar])
-      
-      if(input$order.bar){
-        ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
-          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
-          facet_wrap(~facet) + 
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
+    if(input$vert.bar!=TRUE){
+      if(input$bar.norm==T){
+        #Here we add a condition to allow users not to fill the bar-chart
+        if (input$fac.bar != 0 & input$col.bar == 0) {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar == 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar != 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()
+          }
+          
+          
+        }
       } else {
-        ggplot(data.barchart, aes(x=x, y=y)) +
-          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
-          facet_wrap(~facet) + 
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
-      }
-      
-    } else if(input$fac.bar == 0 & input$col.bar == 0){
-      data.barchart <-
-        data.frame(x = DATA()[,input$x.bar],
-                   y = DATA()[,input$y.bar])
-      
-      if(input$order.bar){
-        ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
-          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
         
-      } else {
-        ggplot(data.barchart, aes(x=x, y=y)) +
-          stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, width = 0.2) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
+        #NON-NORMAL
+        if (input$fac.bar != 0 & input$col.bar == 0) {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar == 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar != 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()
+          }
+          
+        } else {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()
+          }
+          
+          
+        }
       }
-      
-    } else if(input$fac.bar == 0 & input$col.bar != 0){
-      data.barchart <-
-        data.frame(x = DATA()[,input$x.bar],
-                   y = DATA()[,input$y.bar],
-                   color = DATA()[,input$col.bar])
-      
-      if(input$order.bar){
-        ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
-          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-          labs(fill=paste(input$col.bar)) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
-        
-      } else {
-        ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
-          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-          labs(fill=paste(input$col.bar)) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) +
-          theme_minimal()
-      }
-      
     } else {
-      data.barchart <-
-        data.frame(x = DATA()[,input$x.bar],
-                   y = DATA()[,input$y.bar],
-                   color = DATA()[,input$col.bar],
-                   facet = DATA()[,input$fac.bar])
-      
-      if(input$order.bar){
-        ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
-          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-          labs(fill=paste(input$col.bar)) +
-          facet_wrap(~facet) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) + 
-          theme_minimal()
-        
+      if(input$bar.norm==T){
+        #Here we add a condition to allow users not to fill the bar-chart
+        if (input$fac.bar != 0 & input$col.bar == 0) {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar == 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = mean, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar != 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+          
+        }
       } else {
-        ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
-          stat_summary(geom = "bar", fun.y = mean, position = "dodge") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, position = "dodge") +
-          labs(fill=paste(input$col.bar)) +
-          facet_wrap(~facet) +
-          xlab(input$x.bar) + 
-          ylab(input$y.bar) + 
-          theme_minimal()
+        
+        #NON-NORMAL
+        if (input$fac.bar != 0 & input$col.bar == 0) {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              facet_wrap(~facet) + 
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar == 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y)) +
+              stat_summary(geom = "bar", fun.y = median, fill="grey66") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width = 0.2) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else if(input$fac.bar == 0 & input$col.bar != 0){
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) +
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+        } else {
+          data.barchart <-
+            data.frame(x = DATA()[,input$x.bar],
+                       y = DATA()[,input$y.bar],
+                       color = DATA()[,input$col.bar],
+                       facet = DATA()[,input$fac.bar])
+          
+          if(input$order.bar){
+            ggplot(data.barchart, aes(x=reorder(x,y,FUN=median), y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+            
+          } else {
+            ggplot(data.barchart, aes(x=x, y=y, fill=color)) +
+              stat_summary(geom = "bar", fun.y = median, position = "dodge") +
+              stat_summary(geom = "errorbar", fun.data = med.CI, width=.2,position=position_dodge(.9)) +
+              labs(fill=paste(input$col.bar)) +
+              facet_wrap(~facet) +
+              xlab(input$x.bar) + 
+              ylab(input$y.bar) + 
+              theme_minimal()+
+              theme(axis.text.x = element_text(angle = 90, hjust = 1))
+          }
+          
+          
+        }
       }
-      
       
     }
+    
+    
   })
   
   
@@ -364,23 +707,44 @@ shinyServer(function(input, output) {
                    F2 = DATA()[,input$F2.inter],
                    RESP = DATA()[,input$Resp.inter])
       
-      if(input$Err.inter==TRUE){
-        ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
-          stat_summary(fun.y = mean, geom = "point") +
-          stat_summary(fun.y = mean, geom = "line") +
-          stat_summary(geom = "errorbar", fun.data = mean_se, width=0.1) +
-          labs(color=paste(input$F2.inter)) +
-          xlab(paste(input$F1.inter)) +
-          ylab(paste(input$Resp.inter)) +
-          theme_minimal()
+      if(input$inter.norm==T){
+        if(input$Err.inter==TRUE){
+          ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+            stat_summary(fun.y = mean, geom = "point") +
+            stat_summary(fun.y = mean, geom = "line") +
+            stat_summary(geom = "errorbar", fun.data = mean_cl_normal, fun.args=list(mult=1.96), width=0.1) +
+            labs(color=paste(input$F2.inter)) +
+            xlab(paste(input$F1.inter)) +
+            ylab(paste(input$Resp.inter)) +
+            theme_minimal()
+        } else {
+          ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+            stat_summary(fun.y = mean, geom = "point") +
+            stat_summary(fun.y = mean, geom = "line") +
+            labs(color=paste(input$F2.inter)) +
+            xlab(paste(input$F1.inter)) +
+            ylab(paste(input$Resp.inter)) +
+            theme_minimal()
+        }
       } else {
-        ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
-          stat_summary(fun.y = mean, geom = "point") +
-          stat_summary(fun.y = mean, geom = "line") +
-          labs(color=paste(input$F2.inter)) +
-          xlab(paste(input$F1.inter)) +
-          ylab(paste(input$Resp.inter)) +
-          theme_minimal()
+        if(input$Err.inter==TRUE){
+          ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+            stat_summary(fun.y = median, geom = "point") +
+            stat_summary(fun.y = median, geom = "line") +
+            stat_summary(geom = "errorbar", fun.data = med.CI, width=0.1) +
+            labs(color=paste(input$F2.inter)) +
+            xlab(paste(input$F1.inter)) +
+            ylab(paste(input$Resp.inter)) +
+            theme_minimal()
+        } else {
+          ggplot(data = data.interaction, aes(x = F1, y = RESP, color=F2, group=F2)) +
+            stat_summary(fun.y = mean, geom = "point") +
+            stat_summary(fun.y = mean, geom = "line") +
+            labs(color=paste(input$F2.inter)) +
+            xlab(paste(input$F1.inter)) +
+            ylab(paste(input$Resp.inter)) +
+            theme_minimal()
+        }
       }
       
       
