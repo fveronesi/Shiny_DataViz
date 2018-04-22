@@ -8,12 +8,12 @@ I first developed a Shiny app similar to this as part of the video course "[Lear
 In the video course the focus was on developing an Shiny app for the first time, so the final app was relatively simple. This new version includes more plots, a list is available below:
 
 - Histograms (with option for faceting)
-- Barchart (with error bars, and option for color with dodging and faceting)
+- Barchart (with confidence intervals, and option for color with dodging and faceting, plus a checkbox in case on non-normal distributions)
 - BoxPlots (with option for faceting)
 - Scatterplots (with options for color, size and faceting)
 - TimeSeries 
 
-Error bars in barcharts are computed with the mean_se function in ggplot2, which computes error bars as mean ± standard error. When the color option is set, barcharts are plotted one next to the other for each color (option dodging).
+Error bars in barcharts are computed as 1.96 times the standard error of the mean (1.57 times the standard error of the median in case on non-normal distribution). When the color option is set, barcharts are plotted one next to the other for each color (option dodging).
 
 For scatterplots, if the option for faceting is provided each plot will include a linear regression lines.
 
@@ -28,5 +28,5 @@ For scatterplots, if the option for faceting is provided each plot will include 
 
 ## Download Buttons
 
-Version 2 of the app allows users to download plots at 600dpi. The file size is around 50Mb, but I decided to just allow one save because if users need low-res versions they can simply right-click on the image on screen and save it.
+Version 3 of the app allows users to download plots at high resolution, specifying both width and height of the output image.
 I would like to thank hplieninger for his support!!
