@@ -49,7 +49,9 @@ shinyUI(fluidPage(
         uiOutput("BARy.selector"),
         uiOutput("BARfac.selector"),
         uiOutput("BARcol.selector"),
-        uiOutput("Bar.order"),
+        checkboxInput(inputId="bar.norm", label="Normal Distribution", value=T),
+        checkboxInput(inputId = "order.bar", label = "Reorder:",value=F), 
+        checkboxInput(inputId = "vert.bar", label = "Vertical labs?",value=F),
         actionButton("barchart.button", "Plot!"),
         downloadButton("bar.DW", "Download Plot")
       ),
@@ -58,6 +60,7 @@ shinyUI(fluidPage(
       #INTERACTION PLOT
       conditionalPanel(
         condition = "input.TypePlot == 'inter'",
+        uiOutput("INTER.normal"),
         uiOutput("INTER_F1.selector"),
         uiOutput("INTER_F2.selector"),
         uiOutput("INTER_RES.selector"),
